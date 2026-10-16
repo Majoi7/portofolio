@@ -5,7 +5,6 @@ interface FooterProps {
   copyrightYear?: number;
   wordmark?: string;
   accentColor?: string;
-  onReplayIntro: () => void;
   onOpenAdmin: () => void;
 }
 
@@ -13,7 +12,6 @@ export const Footer: React.FC<FooterProps> = ({
   copyrightYear = 2026,
   wordmark = 'Jeho',
   accentColor = '#d4f22b',
-  onReplayIntro,
   onOpenAdmin,
 }) => {
   const scrollToTop = () => {
@@ -37,16 +35,6 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Action Shortcuts */}
         <div className="flex items-center gap-4 text-xs">
-          {/* Replay Intro Animation Button */}
-          <button
-            onClick={onReplayIntro}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/[0.04] hover:bg-white/[0.08] text-neutral-300 hover:text-white transition-colors cursor-pointer"
-            title="Rejouer l'animation d'ouverture de la vidéo"
-          >
-            <Play className="w-3 h-3 text-[#d4f22b]" />
-            <span>Rejouer l'intro</span>
-          </button>
-
           {/* Admin Dashboard Entry */}
           <button
             onClick={onOpenAdmin}

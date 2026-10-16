@@ -9,16 +9,24 @@
 
 ```bash
 # 1. Installer les dépendances
-npm install
+npm install --legacy-peer-deps
 
-# 2. Lancer la suite de tests unitaires (Node 22+ natif)
+# 2. Configurer Supabase (optionnel mais recommandé pour la persistance)
+# Copier le fichier d'exemple d'environnement
+cp .env.example .env
+# Éditer .env pour ajouter vos credentials Supabase
+# Voir SUPABASE_SETUP.md pour les instructions détaillées
+
+# 3. Lancer la suite de tests unitaires (Node 22+ natif)
 npm test
 
-# 3. Démarrer le serveur de développement local
+# 4. Démarrer le serveur de développement local
 npm run dev
 ```
 
 L'application est disponible immédiatement sur : **`http://localhost:3000`**
+
+> 💡 **Note sur Supabase** : Si vous ne configurez pas Supabase, l'application utilisera localStorage pour la persistance des données (comportement par défaut original).
 
 ---
 

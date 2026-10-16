@@ -23,8 +23,19 @@ export default function App() {
   const store = usePortfolioStore();
   const [selectedCaseStudy, setSelectedCaseStudy] = useState<Project | null>(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [forceReplayAnimation, setForceReplayAnimation] = useState(false);
   const [contactPrefilledService, setContactPrefilledService] = useState('');
+
+  // Show loading state while data is being fetched from Supabase
+  if (store.isLoading) {
+    return (
+      <div className="min-h-screen bg-[#050505] text-[#f5f5f5] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full border-4 border-[#d4f22b] border-t-transparent w-12 h-12 mx-auto mb-4"></div>
+          <p>Loading portfolio data...</p>
+        </div>
+      </div>
+    );
+  }
 
   const publishedProjects = store.projects.filter((p) => p.published);
   const activeServices = store.services.filter((s) => s.active);
@@ -41,18 +52,11 @@ export default function App() {
     scrollToSection('contact');
   };
 
-  const handleReplayIntro = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    setForceReplayAnimation(true);
-  };
-
   return (
     <div className="min-h-screen bg-[#050505] text-[#f5f5f5] selection:bg-[#d4f22b] selection:text-[#050505] antialiased">
       {/* 1. Exact Opening Animation (3x3 grid loader clip-path specification) */}
       <OpeningAnimation
         accentColor={store.settings.accentColor}
-        forcePlay={forceReplayAnimation}
-        onComplete={() => setForceReplayAnimation(false)}
       />
 
       <main>
@@ -62,7 +66,6 @@ export default function App() {
           projectCount={publishedProjects.length}
           copyrightYear={store.settings.copyrightYear}
           onNavigate={scrollToSection}
-          onReplay={handleReplayIntro}
           onOpenAdmin={() => setIsAdminOpen(true)}
         />
 
@@ -112,7 +115,6 @@ export default function App() {
         copyrightYear={store.settings.copyrightYear}
         wordmark={store.settings.wordmark}
         accentColor={store.settings.accentColor}
-        onReplayIntro={handleReplayIntro}
         onOpenAdmin={() => setIsAdminOpen(true)}
       />
 

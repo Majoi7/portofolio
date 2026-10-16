@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Shield } from 'lucide-react';
 
 interface HeroProps {
@@ -6,7 +6,6 @@ interface HeroProps {
   projectCount?: number;
   copyrightYear?: number;
   onNavigate?: (id: string) => void;
-  onReplay?: () => void;
   onOpenAdmin?: () => void;
 }
 
@@ -15,18 +14,9 @@ export const Hero: React.FC<HeroProps> = ({
   projectCount = 4,
   copyrightYear = 2026,
   onNavigate = () => {},
-  onReplay = () => {},
   onOpenAdmin = () => {},
 }) => {
   const haloRef = useRef<HTMLDivElement | null>(null);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const [portraitSrc, setPortraitSrc] = useState<string | null>(() => {
-    try {
-      return localStorage.getItem('jeho_portrait_custom') || null;
-    } catch {
-      return null;
-    }
-  });
 
   // Halo pointermove parallax effect (exact math from user script)
   useEffect(() => {
@@ -65,25 +55,6 @@ export const Hero: React.FC<HeroProps> = ({
     };
   }, []);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files && e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      if (dataUrl) {
-        setPortraitSrc(dataUrl);
-        try {
-          localStorage.setItem('jeho_portrait_custom', dataUrl);
-        } catch {
-          // LocalStorage quota fallback
-        }
-      }
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleNavClick = (e: React.MouseEvent, sectionId: string) => {
     e.preventDefault();
     onNavigate(sectionId);
@@ -108,9 +79,8 @@ export const Hero: React.FC<HeroProps> = ({
         <img
           className="portrait"
           id="portrait"
-          src={portraitSrc || undefined}
+          src="/photo.png"
           alt="Portrait Jehovaly Majoi Djimadjo"
-          hidden={!portraitSrc}
         />
 
         {/* Top Navigation */}
@@ -236,16 +206,6 @@ export const Hero: React.FC<HeroProps> = ({
 
       {/* Floating Control Toolbar (exact buttons from user's demo) */}
       <div className="demo">
-        <button type="button" id="replay" onClick={onReplay}>
-          Rejouer l’animation
-        </button>
-        <button
-          type="button"
-          id="addph"
-          onClick={() => fileInputRef.current?.click()}
-        >
-          {portraitSrc ? 'Changer ma photo' : 'Ajouter ma photo (aperçu)'}
-        </button>
         <button
           type="button"
           onClick={onOpenAdmin}
@@ -255,14 +215,6 @@ export const Hero: React.FC<HeroProps> = ({
           <Shield className="w-3 h-3 text-[#d4f22b]" />
           <span>Admin</span>
         </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          id="ph"
-          accept="image/*"
-          hidden
-          onChange={handleFileChange}
-        />
       </div>
     </>
   );
