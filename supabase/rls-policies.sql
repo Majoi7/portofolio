@@ -31,3 +31,18 @@ create policy "Auth read admin_auth" on admin_auth
 grant usage on schema public to anon, authenticated;
 grant select on settings, projects, technologies, services to anon, authenticated;
 grant select on admin_auth to authenticated;
+
+-- Politique d'insertion publique pour settings (à restreindre selon besoin)
+drop policy if exists "Public insert settings" on settings;
+create policy "Public insert settings" on settings
+  for insert to anon, authenticated
+  with check (true);
+
+-- Politique d'insertion restreinte pour admin_auth (authentifié uniquement)
+drop policy if exists "Auth insert admin_auth" on admin_auth;
+create policy "Auth insert admin_auth" on admin_auth
+  for insert to authenticated
+  with check (true);
+
+-- Grants explicites pour l'insertion
+grant insert on settings, admin_auth to anon, authenticated;
