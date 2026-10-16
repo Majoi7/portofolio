@@ -4,20 +4,23 @@
  * @license Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, Suspense, lazy } from 'react';
 import { usePortfolioStore } from './hooks/usePortfolioStore';
 import { Project } from './lib/portfolio-logic';
-import { OpeningAnimation } from './components/OpeningAnimation';
-import { Hero } from './components/Hero';
-import { SiteBIntro } from './components/SiteBIntro';
-import { TechMarquee } from './components/TechMarquee';
-import { ProjectsGrid } from './components/ProjectsGrid';
-import { CaseStudyModal } from './components/CaseStudyModal';
-import { ServicesSection } from './components/ServicesSection';
-import { AboutSection } from './components/AboutSection';
-import { ContactSection } from './components/ContactSection';
-import { Footer } from './components/Footer';
-import { AdminDashboard } from './components/AdminDashboard';
+
+// Lazy load components for code splitting
+const OpeningAnimation = lazy(() => import('./components/OpeningAnimation'));
+const Hero = lazy(() => import('./components/Hero'));
+const SiteBIntro = lazy(() => import('./components/SiteBIntro'));
+const TechMarquee = lazy(() => import('./components/TechMarquee'));
+const ProjectsGrid = lazy(() => import('./components/ProjectsGrid'));
+const CaseStudyModal = lazy(() => import('./components/CaseStudyModal'));
+const ServicesSection = lazy(() => import('./components/ServicesSection'));
+const AboutSection = lazy(() => import('./components/AboutSection'));
+const ContactSection = lazy(() => import('./components/ContactSection'));
+const Footer = lazy(() => import('./components/Footer'));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+const PageLoader = lazy(() => import('./components/PageLoader'));
 
 export default function App() {
   const store = usePortfolioStore();
@@ -54,102 +57,104 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#f5f5f5] selection:bg-[#d4f22b] selection:text-[#050505] antialiased">
-      {/* 1. Exact Opening Animation (3x3 grid loader clip-path specification) */}
-      <OpeningAnimation
-        accentColor={store.settings.accentColor}
-      />
+      <Suspense fallback={<PageLoader />}>
+        {/* 1. Exact Opening Animation (3x3 grid loader clip-path specification) */}
+        <OpeningAnimation
+          accentColor={store.settings.accentColor}
+        />
 
-      <main>
-        {/* 2. Exact Hero Section (Hero, Halo, Portrait, Nav, Roll text, Wordmark Jeho*, Copy, Demo controls) */}
-        <Hero
-          wordmark={store.settings.wordmark}
-          projectCount={publishedProjects.length}
+        <main>
+          {/* 2. Exact Hero Section (Hero, Halo, Portrait, Nav, Roll text, Wordmark Jeho*, Copy, Demo controls) */}
+          <Hero
+            wordmark={store.settings.wordmark}
+            projectCount={publishedProjects.length}
+            copyrightYear={store.settings.copyrightYear}
+            onNavigate={scrollToSection}
+            onOpenAdmin={() => setIsAdminOpen(true)}
+          />
+
+          {/* 3. Site B Intro: Centered Headline, Avatar & Outline Button */}
+          <SiteBIntro
+            accentColor={store.settings.accentColor}
+            onContactClick={() => scrollToSection('contact')}
+          />
+
+          {/* 4. Tool Band: Infinite masked marquee with official brand SVG icons */}
+          <TechMarquee technologies={store.technologies} />
+
+          {/* 5. Case Studies / Projects: Staggered 2-column grid with ~28px radius and invert arrow button */}
+          <ProjectsGrid
+            projects={store.projects}
+            accentColor={store.settings.accentColor}
+            onSelectProject={(project) => setSelectedCaseStudy(project)}
+          />
+
+          {/* 6. Services & Offerings with concrete deliverables */}
+          <ServicesSection
+            services={store.services}
+            accentColor={store.settings.accentColor}
+            onSelectService={handleSelectService}
+          />
+
+          {/* 7. About Section: IFRI, practical product building philosophy */}
+          <AboutSection
+            accentColor={store.settings.accentColor}
+            onContactClick={() => scrollToSection('contact')}
+          />
+
+          {/* 8. Contact Form: functional, validated, records inquiries in admin + WhatsApp */}
+          <ContactSection
+            accentColor={store.settings.accentColor}
+            whatsappNumber={store.settings.whatsappNumber}
+            email={store.settings.email}
+            prefilledProjectType={contactPrefilledService}
+            onInquirySubmitted={(inquiry) => {
+              store.addInquiry(inquiry);
+            }}
+          />
+        </main>
+
+        {/* 9. Footer with replay animation shortcut, admin and copyright */}
+        <Footer
           copyrightYear={store.settings.copyrightYear}
-          onNavigate={scrollToSection}
+          wordmark={store.settings.wordmark}
+          accentColor={store.settings.accentColor}
           onOpenAdmin={() => setIsAdminOpen(true)}
         />
 
-        {/* 3. Site B Intro: Centered Headline, Avatar & Outline Button */}
-        <SiteBIntro
+        {/* 10. Case Study Modal (matching video frame 00:04/00:05 layout) */}
+        <CaseStudyModal
+          project={selectedCaseStudy}
+          onClose={() => setSelectedCaseStudy(null)}
           accentColor={store.settings.accentColor}
-          onContactClick={() => scrollToSection('contact')}
         />
 
-        {/* 4. Tool Band: Infinite masked marquee with official brand SVG icons */}
-        <TechMarquee technologies={store.technologies} />
-
-        {/* 5. Case Studies / Projects: Staggered 2-column grid with ~28px radius and invert arrow button */}
-        <ProjectsGrid
+        {/* 11. Full-featured Private Admin Dashboard (Modules A through L) */}
+        <AdminDashboard
+          isOpen={isAdminOpen}
+          onClose={() => setIsAdminOpen(false)}
+          isAuthenticated={store.isAdminAuthenticated}
+          onLogin={store.loginAdmin}
+          onLogout={store.logoutAdmin}
+          settings={store.settings}
           projects={store.projects}
-          accentColor={store.settings.accentColor}
-          onSelectProject={(project) => setSelectedCaseStudy(project)}
-        />
-
-        {/* 6. Services & Offerings with concrete deliverables */}
-        <ServicesSection
+          technologies={store.technologies}
           services={store.services}
-          accentColor={store.settings.accentColor}
-          onSelectService={handleSelectService}
+          inquiries={store.inquiries}
+          onUpdateSettings={store.updateSettings}
+          onAddProject={store.addProject}
+          onUpdateProject={store.updateProject}
+          onDeleteProject={store.deleteProject}
+          onToggleProjectPublished={store.toggleProjectPublished}
+          onToggleProjectFeatured={store.toggleProjectFeatured}
+          onToggleTechVisible={store.toggleTechVisible}
+          onToggleServiceActive={store.toggleServiceActive}
+          onUpdateInquiryStatus={store.updateInquiryStatus}
+          onUpdateInquiryNotes={store.updateInquiryNotes}
+          onDeleteInquiry={store.deleteInquiry}
+          onResetDefaults={store.resetToDefaults}
         />
-
-        {/* 7. About Section: IFRI, practical product building philosophy */}
-        <AboutSection
-          accentColor={store.settings.accentColor}
-          onContactClick={() => scrollToSection('contact')}
-        />
-
-        {/* 8. Contact Form: functional, validated, records inquiries in admin + WhatsApp */}
-        <ContactSection
-          accentColor={store.settings.accentColor}
-          whatsappNumber={store.settings.whatsappNumber}
-          email={store.settings.email}
-          prefilledProjectType={contactPrefilledService}
-          onInquirySubmitted={(inquiry) => {
-            store.addInquiry(inquiry);
-          }}
-        />
-      </main>
-
-      {/* 9. Footer with replay animation shortcut, admin and copyright */}
-      <Footer
-        copyrightYear={store.settings.copyrightYear}
-        wordmark={store.settings.wordmark}
-        accentColor={store.settings.accentColor}
-        onOpenAdmin={() => setIsAdminOpen(true)}
-      />
-
-      {/* 10. Case Study Modal (matching video frame 00:04/00:05 layout) */}
-      <CaseStudyModal
-        project={selectedCaseStudy}
-        onClose={() => setSelectedCaseStudy(null)}
-        accentColor={store.settings.accentColor}
-      />
-
-      {/* 11. Full-featured Private Admin Dashboard (Modules A through L) */}
-      <AdminDashboard
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
-        isAuthenticated={store.isAdminAuthenticated}
-        onLogin={store.loginAdmin}
-        onLogout={store.logoutAdmin}
-        settings={store.settings}
-        projects={store.projects}
-        technologies={store.technologies}
-        services={store.services}
-        inquiries={store.inquiries}
-        onUpdateSettings={store.updateSettings}
-        onAddProject={store.addProject}
-        onUpdateProject={store.updateProject}
-        onDeleteProject={store.deleteProject}
-        onToggleProjectPublished={store.toggleProjectPublished}
-        onToggleProjectFeatured={store.toggleProjectFeatured}
-        onToggleTechVisible={store.toggleTechVisible}
-        onToggleServiceActive={store.toggleServiceActive}
-        onUpdateInquiryStatus={store.updateInquiryStatus}
-        onUpdateInquiryNotes={store.updateInquiryNotes}
-        onDeleteInquiry={store.deleteInquiry}
-        onResetDefaults={store.resetToDefaults}
-      />
+      </Suspense>
     </div>
   );
 }

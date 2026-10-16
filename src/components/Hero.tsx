@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Shield } from 'lucide-react';
+import { useRafThrottle } from '../hooks/useRafThrottle';
 
 interface HeroProps {
   wordmark?: string;
@@ -32,9 +33,14 @@ export const Hero: React.FC<HeroProps> = ({
     let cy = 0;
     let animId: number;
 
-    const handlePointerMove = (e: PointerEvent) => {
+    // Throttle pointermove updates using RAF for better performance
+    const throttledPointerMove = useRafThrottle((e: PointerEvent) => {
       tx = (e.clientX / window.innerWidth - 0.5) * 40;
       ty = (e.clientY / window.innerHeight - 0.5) * 30;
+    });
+
+    const handlePointerMove = (e: PointerEvent) => {
+      throttledPointerMove(e);
     };
 
     window.addEventListener('pointermove', handlePointerMove);
@@ -81,6 +87,8 @@ export const Hero: React.FC<HeroProps> = ({
           id="portrait"
           src="/photo.png"
           alt="Portrait Jehovaly Majoi Djimadjo"
+          fetchpriority="high"
+          decoding="async"
         />
 
         {/* Top Navigation */}
