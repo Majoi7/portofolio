@@ -9,17 +9,19 @@ import { usePortfolioStore } from './hooks/usePortfolioStore';
 import { Project } from './lib/portfolio-logic';
 
 // Lazy load components for code splitting
-const OpeningAnimation = lazy(() => import('./components/OpeningAnimation'));
-const Hero = lazy(() => import('./components/Hero'));
-const SiteBIntro = lazy(() => import('./components/SiteBIntro'));
-const TechMarquee = lazy(() => import('./components/TechMarquee'));
-const ProjectsGrid = lazy(() => import('./components/ProjectsGrid'));
-const CaseStudyModal = lazy(() => import('./components/CaseStudyModal'));
-const ServicesSection = lazy(() => import('./components/ServicesSection'));
-const AboutSection = lazy(() => import('./components/AboutSection'));
-const ContactSection = lazy(() => import('./components/ContactSection'));
-const Footer = lazy(() => import('./components/Footer'));
-const AdminDashboard = lazy(() => import('./components/AdminDashboard'));
+// Note: Most components have named exports, so we need to extract the named export
+// PageLoader has a default export, so we can use regular lazy
+const OpeningAnimation = lazy(() => import('./components/OpeningAnimation').then(module => ({ default: module.OpeningAnimation })));
+const Hero = lazy(() => import('./components/Hero').then(module => ({ default: module.Hero })));
+const SiteBIntro = lazy(() => import('./components/SiteBIntro').then(module => ({ default: module.SiteBIntro })));
+const TechMarquee = lazy(() => import('./components/TechMarquee').then(module => ({ default: module.TechMarquee })));
+const ProjectsGrid = lazy(() => import('./components/ProjectsGrid').then(module => ({ default: module.ProjectsGrid })));
+const CaseStudyModal = lazy(() => import('./components/CaseStudyModal').then(module => ({ default: module.CaseStudyModal })));
+const ServicesSection = lazy(() => import('./components/ServicesSection').then(module => ({ default: module.ServicesSection })));
+const AboutSection = lazy(() => import('./components/AboutSection').then(module => ({ default: module.AboutSection })));
+const ContactSection = lazy(() => import('./components/ContactSection').then(module => ({ default: module.ContactSection })));
+const Footer = lazy(() => import('./components/Footer').then(module => ({ default: module.Footer })));
+const AdminDashboard = lazy(() => import('./components/AdminDashboard').then(module => ({ default: module.AdminDashboard })));
 const PageLoader = lazy(() => import('./components/PageLoader'));
 
 export default function App() {

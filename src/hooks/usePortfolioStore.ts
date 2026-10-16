@@ -36,7 +36,11 @@ export function usePortfolioStore() {
           .maybeSingle();
 
         if (settingsError && settingsError.code !== 'PGRST116') { // PGRST116 means no rows returned
-          console.error('Error fetching settings:', settingsError);
+          console.error('Error fetching settings:', {
+            message: settingsError.message,
+            code: settingsError.code,
+            details: settingsError.details
+          });
         } else if (settingsData) {
           // Map database fields to TypeScript interface
           const mappedSettings: SiteSettings = {
@@ -63,7 +67,11 @@ export function usePortfolioStore() {
           .order('order', { ascending: true });
 
         if (projectsError && projectsError.code !== 'PGRST116') {
-          console.error('Error fetching projects:', projectsError);
+          console.error('Error fetching projects:', {
+            message: projectsError.message,
+            code: projectsError.code,
+            details: projectsError.details
+          });
         } else if (projectsData) {
           // Map database fields to TypeScript interface
           const mappedProjects: Project[] = projectsData.map((proj: any) => ({
@@ -108,7 +116,11 @@ export function usePortfolioStore() {
           .order('order', { ascending: true });
 
         if (technologiesError && technologiesError.code !== 'PGRST116') {
-          console.error('Error fetching technologies:', technologiesError);
+          console.error('Error fetching technologies:', {
+            message: technologiesError.message,
+            code: technologiesError.code,
+            details: technologiesError.details
+          });
         } else if (technologiesData) {
           // Map database fields to TypeScript interface
           const mappedTechnologies: Technology[] = technologiesData.map((tech: any) => ({
@@ -134,7 +146,11 @@ export function usePortfolioStore() {
           .order('order', { ascending: true });
 
         if (servicesError && servicesError.code !== 'PGRST116') {
-          console.error('Error fetching services:', servicesError);
+          console.error('Error fetching services:', {
+            message: servicesError.message,
+            code: servicesError.code,
+            details: servicesError.details
+          });
         } else if (servicesData) {
           // Map database fields to TypeScript interface
           const mappedServices: Service[] = servicesData.map((serv: any) => ({
@@ -161,7 +177,11 @@ export function usePortfolioStore() {
           .order('created_at', { ascending: false });
 
         if (inquiriesError && inquiriesError.code !== 'PGRST116') {
-          console.error('Error fetching inquiries:', inquiriesError);
+          console.error('Error fetching inquiries:', {
+            message: inquiriesError.message,
+            code: inquiriesError.code,
+            details: inquiriesError.details
+          });
         } else if (inquiriesData) {
           // Map database fields to TypeScript interface
           const mappedInquiries: ClientInquiry[] = inquiriesData.map((inq: any) => ({
@@ -189,12 +209,20 @@ export function usePortfolioStore() {
           .maybeSingle();
 
         if (authError && authError.code !== 'PGRST116') {
-          console.error('Error fetching admin auth:', authError);
+          console.error('Error fetching admin auth:', {
+            message: authError.message,
+            code: authError.code,
+            details: authError.details
+          });
         } else if (authData) {
           setIsAdminAuthenticated(authData.is_authenticated);
         }
       } catch (err) {
-        console.error('Error initializing data:', err);
+        console.error('Error initializing data:', {
+          message: err instanceof Error ? err.message : String(err),
+          // Try to get a safe string representation
+          toString: typeof err.toString === 'function' && err.toString !== Object.prototype.toString ? err.toString() : undefined
+        });
         // Fallback to initial data on error
         setSettings(INITIAL_SETTINGS);
         setProjects(INITIAL_PROJECTS);
@@ -255,7 +283,10 @@ export function usePortfolioStore() {
             });
           }
         } catch (err) {
-          console.error('Error syncing settings:', err);
+          console.error('Error syncing settings:', {
+            message: err instanceof Error ? err.message : String(err),
+            toString: typeof err.toString === 'function' && err.toString !== Object.prototype.toString ? err.toString() : undefined
+          });
         }
       };
 
@@ -305,7 +336,10 @@ export function usePortfolioStore() {
             await supabase.from('projects').insert(projectsToInsert);
           }
         } catch (err) {
-          console.error('Error syncing projects:', err);
+          console.error('Error syncing projects:', {
+            message: err instanceof Error ? err.message : String(err),
+            toString: typeof err.toString === 'function' && err.toString !== Object.prototype.toString ? err.toString() : undefined
+          });
         }
       };
 
@@ -337,7 +371,10 @@ export function usePortfolioStore() {
             await supabase.from('technologies').insert(techsToInsert);
           }
         } catch (err) {
-          console.error('Error syncing technologies:', err);
+          console.error('Error syncing technologies:', {
+            message: err instanceof Error ? err.message : String(err),
+            toString: typeof err.toString === 'function' && err.toString !== Object.prototype.toString ? err.toString() : undefined
+          });
         }
       };
 
@@ -370,7 +407,10 @@ export function usePortfolioStore() {
             await supabase.from('services').insert(servicesToInsert);
           }
         } catch (err) {
-          console.error('Error syncing services:', err);
+          console.error('Error syncing services:', {
+            message: err instanceof Error ? err.message : String(err),
+            toString: typeof err.toString === 'function' && err.toString !== Object.prototype.toString ? err.toString() : undefined
+          });
         }
       };
 
@@ -404,7 +444,10 @@ export function usePortfolioStore() {
             await supabase.from('inquiries').insert(inquiriesToInsert);
           }
         } catch (err) {
-          console.error('Error syncing inquiries:', err);
+          console.error('Error syncing inquiries:', {
+            message: err instanceof Error ? err.message : String(err),
+            toString: typeof err.toString === 'function' && err.toString !== Object.prototype.toString ? err.toString() : undefined
+          });
         }
       };
 
@@ -436,7 +479,10 @@ export function usePortfolioStore() {
             });
           }
         } catch (err) {
-          console.error('Error syncing admin auth:', err);
+          console.error('Error syncing admin auth:', {
+            message: err instanceof Error ? err.message : String(err),
+            toString: typeof err.toString === 'function' && err.toString !== Object.prototype.toString ? err.toString() : undefined
+          });
         }
       };
 
